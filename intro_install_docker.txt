@@ -1,0 +1,49 @@
+Docker 
+
+Host Website 
+
+1. IP add Domain_name
+2. Repository to host code(Local/cloud server)
+3. Apache/httpd >> /var/www/httpd >> add web files
+4. Start and enable services
+5. Firewall rules
+
+
+
+
+
+https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
+
+To get docker script
+curl -fsSL https://get.docker.com -o get-docker.sh
+
+
+To install script
+sudo sh get-docker.sh
+
+To add user ubuntu into docker group
+sudo usermod -aG docker ubuntu
+
+To list all container's containers
+sudo docker ps -a
+
+To list container images
+sudo docker images
+
+To create container
+sudo docker run hello-world
+
+To create ubuntu:18.04 container
+sudo docker run -it ubuntu:18.04 /bin/bash
+
+>>you must be inside container
+
+** Open new terminal and check container's running
+docker ps
+
+
+
+
+
+
+
