@@ -102,6 +102,17 @@ docker run -dt --name web6 --cpus=1 -m=200MB  ubuntuweb /bin/bash
 
 To update processor and memory of running container
 docker update --help
+$ docker update -m 100M --memory-swap 100M  web4
+
+
+Docker stats command 
+To get CPU only 
+$docker stats --no-stream --format {{.CPUPerc}} web4
+
+To get Memory_usage only
+$ docker stats --no-stream --format {{.MemUsage}} web4
+
+
 
 
 
