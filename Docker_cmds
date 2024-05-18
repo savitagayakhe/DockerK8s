@@ -75,6 +75,37 @@ docker exec -it testweb1 service apache2 start
 >> check using host web-browser if web-service from new container is working
 
 
+==================================================================================================
+To get details of container
+docker inspect container_name
+docker inspect web4
+
+To get process running inside container web4
+docker top web4
+
+To pause(Processes running inside container) container
+docker pause web4
+
+To unpause
+docker unpause web4
+
+To get memory and processor consumption details
+docker stats web4
+
+docker stats --no-stream
+
+To create container with cpu 
+docker run -dt --name web5 --cpus=2  ubuntuweb /bin/bash
+
+To assign cpu and memory
+docker run -dt --name web6 --cpus=1 -m=200MB  ubuntuweb /bin/bash
+
+To update processor and memory of running container
+docker update --help
+
+
+
+
 
 
 
