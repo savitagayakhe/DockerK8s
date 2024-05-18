@@ -1,0 +1,95 @@
+To pull image
+$ docker pull ubuntu:23.04
+>> name of app without tag will add latest as default tag
+ubuntu:latest
+
+To list images
+$ docker images
+or 
+$ docker image ls
+To create container of name u1 using image just now we pulled
+$ docker run -it --name u1 ubuntu:23.04
+
+To see  running containers
+$ docker ps
+
+To see all running,stopped exited containers
+$ docker ps -a
+
+**containers can be managed using container name or ID
+To start cotainer
+$ docker start u1 
+
+To get inside/attach to container
+$ docker start -ai u1 
+
+To come-out of container
+exit
+
+To execute command remotely(from host) for container
+**Container must be started(running)
+$ docker exec -it u1 ls
+
+To get ip add of container
+$ docker exec -it u1 hostname -i
+
+** Create ubuntu:20.04 container and configure it as Web-server ***
+A. docker run -it --name web1 ubuntu:20.04 /bin/bash
+  >> update O.s.
+     apt update -y
+  >> To install web-service(apache2)
+     apt install apache2 -y
+  >> To start apache2(service)
+     service apache2 start
+  >> Get IP add of container
+     hostname -i
+>> From host >> open browser >> http:// ip_add
+                             >> sample ubuntu test webpage
+         >> Web-service is working fine
+Create index.html file and add it to /var/www/html
+  >> May be editor required so need to install it using
+     apt install -y package_name
+
+Refresh Host browser >> New web-page will be loaded
+==========================================================================================================
+To create image from existing container >> docker commit
+  
+** Try to remove data and files which in not required in the container
+Exit from container
+
+
+>> syntax of the command Docker commit container_name image_name
+docker commit web1 ubuntuweb
+
+>> To verify if image is created
+docker images
+>> ubuntuweb must be listed
+
+** Create container of name testweb1 using ubuntuweb image
+docker run -it --name testweb1 ubuntuweb /bin/bash
+
+>> Check ip add of testweb1 container and service apache2 is running
+docker exec -it testweb1 hostname -i
+docker exec -it testweb1 service apache2 status
+docker exec -it testweb1 service apache2 start
+>> check using host web-browser if web-service from new container is working
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
