@@ -1,0 +1,28 @@
+To copy files from Host(docker system) to container 
+docker cp source_Complete/path Container_name|IP:Destination_path
+docker cp /home/ubuntu/Desktop/index.html web1:/var/www/html
+
+To copy dir
+docker cp /home/ubuntu/Desktop/data web1:/
+
+** To Access Web-service hosted by container using Host_ip; we must expose port from container
+To map port of  Host port 8080 to web service 80  
+  $ docker run -itd --name o2 -p  8080:80  oxer:1 /bin/bash
+
+Docker storage 
+To store access files from host and container
+A. bind Mounts
+   Dir must be created in host 
+mkdir data
+docker run -itd --name ubuntu1  --mount type=bind,source=/home/ubuntu/Desktop/data,target=/opt/data ubuntu:20.04 /bin/bash
+
+>> Create some files from host and check using container if its Accessible
+
+
+To get docker details 
+docker system info
+
+All data of docker stored in /var/lib/docker including container, images, network, volumes etc..
+
+Next session Docker Volume and Dockerfile
+
