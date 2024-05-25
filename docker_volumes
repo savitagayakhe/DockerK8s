@@ -1,0 +1,59 @@
+To list volumes
+docker volume ls
+
+To create volume of name vol1
+docker volume create vol1
+
+To get details about volume
+docker volume inspect vol1
+>> on host volume is stored in /var/lib/docker/volume/vol_name/_data
+
+To attach volume to container 
+A. --mount source=vol_name,destination=/path_in_container
+docker run -itd --name voltest --mount source=vol1,destination=/opt ubuntu:20.04 /bin/bash
+
+>> Check if volume is mounted with permission
+docker inspect container_name
+docker volume inspect voltest
+
+>> try to create some file in /opt using cotainer commands
+docker exec -it voltest touch /opt/t1.txt
+docker exec -it voltest ls /opt
+>> we can write data in volume using conatiner
+
+>> To add data from host
+sudo cp index.html /var/lib/docker/volumes/vol1/_data/
+ls /var/lib/docker/volumes/vol1/_data/
+
+To check from container 
+docker exec -it voltest ls /opt
+
+>> files/data can be modified by file as volumes mounted by default using rw permission
+
+
+B. Using -v option
+   -v source(Volume_name):Destination(path_in_container):ro
+
+** To mount volume with RO permission fpr container
+docker run -itd --name voltest3 -v vol1:/opt:ro -h voltest3  ubuntu:20.04 /bin/bash
+>> try to list data of /opt in voltest3
+docker exec -it voltest3 cat /opt/t1.txt
+docker exec -it voltest3 cat /opt/index.html
+>> files can be read
+
+Try to create file
+docker exec -it voltest3 touch /opt/t3.txt
+>> permission denied
+
+To get docker disk usage
+docker system df -h
+
+To delete all unused volumes
+$ docker volume prune -a
+
+To delete volumes in use
+>> we must delete containers which are using them 1st and then delete volume
+$ docker rm -f voltest3
+
+$ docker volume  rm vol1
+vol1
