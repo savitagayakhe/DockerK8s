@@ -1,0 +1,127 @@
+Docker images using Dockerfile
+
+
+Steps we need to create and run nginx service
+1. created ubuntu container
+2. update O.S. 
+3. install apache2
+4. copy index.html to /var/www/html
+5. start apache2
+
+
+
+Dockerfile
+*Docker context >> dir where we need to put Dockerfile and related data
+
+Write Dockerfile to create nginx server image
+
+mkdir u2
+cd u2
+cretae index.html
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ cat index.html 
+ <!DOCTYPE html>
+<html>
+<body>
+
+<h1>Ubuntu</h1>
+<p>Apache2 container</p>
+
+</body>
+</html> 
+save and exit
+
+Create Dockerfile and write like below
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ cat Dockerfile
+FROM ubuntu:20.04
+RUN apt-get update
+RUN apt-get install nginx -y
+COPY index.html /var/www/html
+CMD ["nginx", "-g", "daemon off;"]
+save and exit
+
+>>To create image of name nginx_1 from cureent Dockerfile
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ docker build -t nginx_1 .
+
+>> Verify using 
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ docker images
+
+>> Create container using this image
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ docker run -itd --name n2 nginx_1
+
+>> to verify if service is running inside container
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ docker run -itd --name n2 nginx_1
+
+To get ip address of container
+ubuntu@ubuntu-virtual-machine:~/Desktop/u2$ docker exec -it n2 hostname -i
+172.17.0.3
+
+From browser verify web-site
+http://172.17.0.3/
+>> should display ubuntu Apache2 container web-page
+
+DONE!!!!
+
+======================================================== Dockerfile Dockerfile for apache2 using ubuntu:20.04
+
+ubuntu@ubuntu-virtual-machine:~/Desktop/u1$ cat Dockerfile 
+FROM ubuntu:20.04
+#ENV TZ=Asia/Kolkata
+RUN apt-get update 
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
+RUN apt-get install -y apache2
+COPY index.html /var/www/html
+EXPOSE 80
+# Start Apache in the foreground
+CMD ["apache2ctl", "-D", "FOREGROUND"]
+save and exit
+
+Build image
+ubuntu@ubuntu-virtual-machine:~/Desktop/u1$ docker build -t u20apache2 .  
+
+ubuntu@ubuntu-virtual-machine:~/Desktop/u1$ docker run -itd --name u20  u20apache2
+
+ubuntu@ubuntu-virtual-machine:~/Desktop/u1$ docker exec -it u20  service apache2 status
+ * apache2 is running
+
+ubuntu@ubuntu-virtual-machine:~/Desktop/u1$ docker exec -it u20  hostname -i
+172.17.0.2
+
+>> use browser >> http:172.17.0.2
+
+=================================================================usiusing centos7 create httpd service
+ubuntu@ubuntu-virtual-machine:~/Desktop/centos$ ls
+Dockerfile  index.html
+
+ubuntu@ubuntu-virtual-machine:~/Desktop/centos$ cat Dockerfile 
+#This is to create apache2 website
+FROM centos:7
+#RUN yum  update 
+RUN yum -y install httpd; yum clean all; systemctl enable httpd.service
+COPY index.html /var/www/html
+EXPOSE 80
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+save and exit
+
+To create image
+ubuntu@ubuntu-virtual-machine:~/Desktop/centos$ docker build -t savita2009/c7httpd . 
+
+Cretae container and portmapping with host using 8585 port no
+buntu@ubuntu-virtual-machine:~/Desktop/centos$ docker run -itd --name h2 -p 8585:80 savita2009/c7httpd
+
+>> go to host browser
+   host_ip:8585
+http://192.168.204.167:8585/
+==========================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
