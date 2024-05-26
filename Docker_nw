@@ -1,0 +1,92 @@
+Docker networking
+
+By default 3 networks are created by docker engine
+1. Bridge:- Default nw for all containers 
+          - private internal nw (usually series 172.17.0.0)
+          - Containers can talk to each other using IP
+          - To access container from external(outside) nw we must map host port with containers port
+          
+
+
+2. Host:- To access container from external nw use host network by containers
+        - NO need to map port no. as it automatically uses host nw
+        - No isolation between Docker host and Container
+        - e.g. to access web container of port no 8000 directly using host add:8000 we can access it 
+         - Cant run multiple web containers on same host with same port no.
+          
+
+3. None:- Containers are not attached to any network; run in isolated nw
+        - Hence no access/communication with other containers or external nw
+        
+
+Docker create only one bridge nw by default; If we need some containers in another(custom) nw 
+we need to create nw 
+
+To cretae nw using bridge driver and name as mynetwork
+docker network create --driver bridge --subnet 192.168.100.0/24 mynetwork
+
+To list all nw
+docker network ls
+
+
+To get details about network 
+docker network inspect network_id
+
+** we can connect single container to multiple nw
+To connect nw to container
+docker network connect network_name container_name
+
+To disconnect container from nw
+docker network disconnect network_name container_name
+
+
+Containers talk to each other using there(container) names
+>> Docker uses DNS(embedded) 
+>> containers resolves each-other using DNS(with container_names)
+>> this DNS generally works at 127.0.0.1 address 
+
+
+** containers created with user-defined nw can communicate(ping) wih each other
+   >> same thing with default bridge nw is not possible
+
+
+TASK >> create a network with name mynet and subnet 192.168.100.0/16
+      Create 2 containers 
+      try to execute ping command from both containers pinging another using name
+     >> it works due to /etc/resolve.conf >> DNS (127.0.0.11)
+for pinging may be iputils-ping package required to install in containers
+
+ 
+for reference    
+https://docs.docker.com/network/#dns-services
+
+To connect existing container to custom nw
+docker network connect network_name container_name
+** container can connect multiple networks
+
+
+To see which containers connected to network
+docker inspect nw_name
+>> endpoints are container
+
+Stop and remove containers connected and then we can remove network
+
+To remove/delete network
+docker network rm network_name
+
+To remve all unused nw
+docker network prune
+=======================================================
+
+       
+
+
+
+
+
+
+
+
+
+
+
