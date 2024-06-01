@@ -1,0 +1,17 @@
+1. Create container for jenkins application using image_name jenkins/jenkins expose port 8080 
+>> Access jenkins application using host system
+
+2. Run container of the ubuntu image to run the sleep 500 command at startup.
+
+3. create volume of name database1
+4. Create mysql container(with required enviornment variables)   
+   - mysql container must store data in database1 volume
+   - mysql must be exposed to port no 3306 from container and host
+
+5. create network of name webserver with ip configured to 192.168.0.0/24 
+
+6. create apache2 container using network webserver and map local dir to apache2 container to share data between container and host
+
+7. Create image of task-4 container
+8. Write a dockerfile to create container of nginx  using base image as centos .
+   nginx service must be up and running after creating container using this image
