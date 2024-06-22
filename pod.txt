@@ -1,0 +1,61 @@
+Pod
+- Kubernetes doesn’t run containers directly on the nodes. Every container is encapsulated by a pod.
+- Smallest unit of Kubernetes
+- A pod is a single instance of an application. If another instance of the application needs to be deployed, another pod is deployed with the containerized application running inside it.
+- Creates a running environment over the container so that we only interact with the Kubernetes layer. This allows us to replace the container technology like Docker.
+- **Each pod gets an internal IP address** for communicating with each other (virtual network created by K8)
+- If a pod is restarted (maybe after the application running on it crashed), its IP address may change
+
+Commands for pod
+1.To create pod
+kubectl run nginx --image=nginx
+
+2.To see pods
+kubectl get pods
+
+3.To see details of pod
+kubectl describe pods
+
+4. Command to create pod-nginx.yaml
+kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
+
+To execute 
+kubectl apply -f nginx-pod.yaml
+
+
+
+Config file for a Pod
+pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: frontend
+spec:
+  containers:
+	  - name: httpd
+	    image: httpd:2.4-alpine
+
+
+# Restart Policy
+
+The default behavior of K8s is to restart a pod if it terminates. This is desirable for long running containers like web applications or databases. But, this is not desirable for short-lived containers such as a container to process an image or run analytics. 
+
+`restartPolicy` allows us to specify when K8s should restart the pod.
+
+- `Always` - restart the pod if it goes down (default)
+- `Never` - never restart the pod
+- `OnFailure` - restart the pod only if the container inside failed (returned non zero exit code after execution)
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: frontend
+spec:
+  containers:
+	  - name: httpd
+	    image: httpd:2.4-alpine
+  restartPolicy: Never
+
+  

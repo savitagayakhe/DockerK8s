@@ -1,0 +1,70 @@
+# ReplicaSet
+
+- ReplicaSet monitors and maintains the number of replicas of a given pod. It will automatically create a new pod if the pod goes down.
+
+** Newer and better way to manage replicated pods in K8s than Replication Controllers**
+
+- It is needed even if we only have a single pod, because if that pod dies, replica set will create a new pod.
+- It spans the entire cluster to create pods on any node.
+
+
+httpd-rs.yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: httpd-frontend
+  labels:
+    name: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: frontend
+  template:
+    metadata:
+      labels:
+        name: frontend
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:2.4-alpine
+
+- template metadata and spec>> from the config file for the pod (required to create new pods if any of them goes down)
+
+- replicas >> how many replicas to maintain
+        It has an additional required field 
+        selector>> which allows the replica set to select pods that         match specific labels. This way 
+
+
+## Scaling the number of replicas
+1. edit the config file and re-apply - kubectl apply -f config.yaml
+**Recommended**:
+  
+
+2. using kubectl command
+kubectl scale replicaset frontend-rs --replicas=2
+    - This will not update the config file, so changes are hard to track
+
+
+Commands for replicaset
+To create replicaset
+1.kubectl create -f web-rs.yml
+
+2.To see replicasets
+kubectl get rs 
+
+
+3. to check/details of rs
+kubectl describe rs/frontend
+
+4. to replace file
+kubectl replace -f web-rs.yml
+
+5.to scale replicaset
+kubectl scale --replicas=5 web-rs
+
+6. to autocale 
+kubectl autoscale rs frontend-rs --max=10 --min=3 --cpu-percent=50
+
+Alternatives to ReplicaSet
+Deployment (recommended)
