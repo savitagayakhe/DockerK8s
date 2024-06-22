@@ -58,4 +58,38 @@ spec:
 	    image: httpd:2.4-alpine
   restartPolicy: Never
 
+
+
+
+
+# Pod Status and Conditions
+
+## Pod Status
+
+**Pod status tells where the pod is in its lifecycle.
+It can be viewed using `kubectl get pods` command ***
+
+- Pending >>  pod is waiting to be scheduled on a node
+- ContainerCreating >> pulling the images and starting the containers for the pod
+- Running >> the containers inside the pod are running
+
+## Pod Conditions
+
+**Binary values signifying the state of a pod
+     It can be viewed by running kubectl describe pod <pod- name> command and looking at the conditions section***
+
+- PodScheduled >> pod has been scheduled on a node
+- Initialized >> pod has been initialized
+- ContainersReady >> containers inside the pod are ready to run
+- Ready >> pod is ready to run (when all the containers inside the pod are ready to run)
+
+
+## Multi-container pods
+      are used in cases where it’s better to have separate code for some added functionality along with the application code. 
+        Example: log agent alongside the application to collect logs and send them to a centralized log server.
+ Containers inside a pod share the same:
+    - Lifecycle - created and destroyed together
+    - Network - can refer each other as localhost
+    - Storage - can access the same storage volumes
+- All the containers inside a pod must keep running for the pod to remain in running state. If any of them fails, the pod restarts
   
