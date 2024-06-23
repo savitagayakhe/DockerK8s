@@ -1,0 +1,94 @@
+1. Create pod of
+   httpd:2.4-alpine image
+
+2. create replicaset of name httpd-rs 
+   name=httpd-rs
+   replicas=2
+   image=httpd:2.4-alpine
+   port=80
+
+3.rs-definition-1.yaml create rs using below file
+(Error in file fix it)
+apiVersion: v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+fix it and execute it
+
+
+4. rs-definition-2.yaml                             
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+Error in the file fix it and apply it
+
+
+5. Create a new Deployment with the below attributes using your own deployment definition file.
+
+Name: httpd-frontend;
+Replicas: 3;
+Image: httpd:2.4-alpine
+
+6. apply below file to create deployment
+
+---
+apiVersion: apps/v1
+kind: deployment
+metadata:
+  name: deployment-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: busybox-pod
+  template:
+    metadata:
+      labels:
+        name: busybox-pod
+    spec:
+      containers:
+      - name: busybox-container
+        image: busybox888
+        command:
+        - sh
+        
+
+>> check deployment if created and describe it
+>> check replicaset if created and describe it
+>> check how many pods are created and there status
+>> try to fix error in pod creation
+
+7. Create deployment and service for cloudsmart application
+   port no >> 8080
+   link for image
+   https://hub.docker.com/r/savita2009/cs
+              

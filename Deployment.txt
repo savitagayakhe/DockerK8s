@@ -1,0 +1,28 @@
+Deployment
+- Provides the capability to upgrade the instances seamlessly using rolling updates, rollback to previous versions seamlessly, undo, pause and resume changes as required.
+- Abstraction over ReplicaSet
+- When a deployment is created, it automatically creates a ReplicaSet which in turn creates pods. 
+If we run `kubectl get all` we can see the resources created by deployment.
+
+There are two deployment strategies:
+
+1.Recreate: Bring down all the running containers and then bring up the newer version (application downtime)
+2.Rolling Update(default): Bring down a container and then bring up a new container one at a time (no application downtime)
+
+
+commands
+1. to create deployment
+kubectl create deployment --image=nginx nginx
+
+2.Generate Deployment YAML file (-o yaml). Don’t create it(–dry-run)
+kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+
+3.Generate Deployment YAML file (-o yaml). Don’t create it(–dry-run) and save it to a file.
+kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml
+
+4.Make necessary changes to the file (for example, adding more replicas) and then create the deployment.
+kubectl create -f nginx-deployment.yaml
+
+5. cretae deployment with replica specification
+kubectl create deployment --image=nginx nginx --replicas=4 --dry-run=client -o yaml > nginx-deployment.yaml
+
