@@ -1,0 +1,104 @@
+
+Namespaces:-
+In Kubernetes, namespaces provide a mechanism for isolating groups of resources within a single cluster.
+Names of resources need to be unique within a namespace, but not across namespaces. 
+Namespace-based scoping is applicable only for namespaced objects (e.g. Deployments, Services, etc.) and not for cluster-wide objects (e.g. StorageClass, Nodes, PersistentVolumes,
+Namespaces are a way to divide cluster resources between multiple user.
+   
+To create namespace
+A. using declarative way
+   ns-dev.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: dev
+
+then create using file
+>> kubectl create -f ns-dev.yaml
+
+or
+kubectl create namespace dev
+
+
+To list namespaces
+kubectl get ns or 
+kubectl get namespaces
+
+- BY default resources get created in default namespace
+e.g. myapp-pod.yml
+apiVersion: apps/v1
+kind: Pod
+
+metadata:
+ name: myapp-pod
+ labels:
+   app: myapp
+   type: front-end
+spec:
+ containers:
+ - name: nginx-container
+   image: nginx
+save and exit
+
+To create pod
+kubectl create -f myapp-pod.yml
+>> will create myapp-pod in defaut namespace
+
+To create pod in dev namespace
+kubectl create -f myapp-pod.yml --namespace=dev
+
+or
+
+To create it automatically add ns in metadata section of  myapp-pod.yml like below and then apply it
+metadata:
+ name: myapp-pod
+ namespace: dev
+
+
+To list pods of namespace
+>> kubectl get pods
+Shows default namespace pods
+
+To get pods of dev namespace
+>> kubectl get pods --namespace=dev
+
+To switch to dev namespace
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+Now kubectl get pods will list pods of dev ns 
+
+To see pods of Default(or other ns)
+kubectl get pods --namespace=default
+
+To list pods of all namespaces
+kubectl get pods --all-namespaces
+
+WE can create/set  resource-equota as per namespaces
+like
+compute-quota.yml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "5"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "5"
+    limits.memory: 10Gi
+save and exit
+
+kubectl create -f compute-quota.yaml
+
+
+
+Tasks:-
+1. Create a new namespace called test-ns.
+(Use imperative commands.)
+2. Switch to test-ns namespace
+3. Create a new deployment called redis-deploy in the dev-ns namespace with the redis image. It should have 2 replicas.
+(Use imperative commands.)
+4. Create a pod called httpd using the image httpd:alpine in the default namespace. Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
+(Try to do this with as few steps as possible)
+
