@@ -1,0 +1,100 @@
+logging and monitoring
+
+Locations of relevant log files
+Control Plane nodes
+API Server >> /var/log/container/kube-apiserver.log
+Scheduler >> /var/log/container/kube-scheduler.log
+Controller manager >> /var/log/container/kube-controller-manager.log
+
+-> /var/log/pods/
+
+Worker Nodes
+ logs from the kubelet>>
+logs from kube-proxy >> /var/log/container/kube-proxy.log
+
+
+journalctl -u kubelet
+
+Metrics server, Prometheus Elastic stack are open source monitoring solutions
+
+
+Monitor cluster components
+- no of nodes and there health status
+- no of pods and there resource utilization
+
+Heapster:- monitor and analyses kubernetes 
+         - deprecated
+ Now days its slim down to MetricS Server
+
+https://kubernetes.io/docs/tasks/debug/debug-cluster/resource-metrics-pipeline/
+
+https://kubernetes.io/docs/concepts/cluster-administration/logging/
+
+
+Metrics Server:-
+- Each k8s cluster needs one metric server
+- In memory metric solution
+- Gets metrics from cluster node and'
+- It gets metrics from each node and pod from the cluster then aggregates and store them in memory
+- kubelet has CAdvisor(Container Advisor) component which   retrievs performance metrics from pod and expose it to 
+  metric available using kubelet metric
+
+To deploy metric server to monitor pods and nodes
+1. pull repo from git
+git clone https://github.com/savitagayakhe/k8smonitor.git
+controlplane ~ ➜  ls
+k8smonitor  sample.yaml
+
+2.Deploy the metrics-server by creating all the components downloaded
+controlplane ~ ➜  cd k8smonitor/
+controlplane kubernetes-metrics-server on  master ➜  kubectl apply -f metrics-server_components.yaml
+
+3. to confirm deployment
+controlplane kubernetes-metrics-server on  master ➜  kubectl get deployment -n kube-system
+
+4.
+controlplane kubernetes-metrics-server on  master ➜  kubectl top node
+      
+5.controlplane kubernetes-metrics-server on  master ➜  kubectl top pods
+ 
+
+
+======================================================
+Managing application logs
+
+when we used docker run container_name 
+>> show on screen logs of that container
+
+but if we run it in detached (-d_ mode it wont)
+
+to see live logs(following) of container
+docker logs -f pod_name
+
+in kubernetes also we can see logs of pods 
+kubectl logs -f pod_name
+
+** IN case of multiple container running inside a pod we must specify for which contaibner we want to see logs
+
+kubectl logs -f pod_name container_name
+
+
+Print the logs for the last 1 hour for a pod
+kubectl logs --since=6h <pod_name>
+
+Get the most recent 5 lines of logs for a pod
+kubectl logs --tail=5 <pod_name>
+
+Print the logs for a container in a pod
+kubectl logs -c <container_name> <pod_name>
+
+Output the logs for a pod into a file named ‘pod.log’
+kubectl logs <pod_name> > pod.log
+
+View the logs for a previously failed pod
+kubectl logs --previous <pod_name>
+
+View the logs for all containers in a pod
+kubectl logs <pod_name> --all-containers
+
+
+
