@@ -1,0 +1,64 @@
+Network policies
+https://kubernetes.io/docs/concepts/services-networking/network-policies/
+ 
+
+kubectl create deployment nginx --image=nginx 
+
+ kubectl expose deployment nginx --port=80
+
+
+controlplane $ cat nginx-nw-policy.yaml 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nginx-nw-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+      - podSelector:
+          matchLabels:
+            acc: "true"
+save and exit
+
+
+Create busybox pod and try to access nginx service(without label)
+wget --spider --timeout=1 nginx
+>> timeout error
+
+
+Try to create busybox with label and access nginx service again
+controlplane $ kubectl run busybox --rm  -it --image=busybox:1.28 --labels="acc=true"  /bin/sh
+
+wget --spider --timeout=1 nginx
+
+
+To get networkpolicies
+ kubectl get networkpolicies
+
+ kubectl describe networkpolicies nginx-nw-policy
+
+delete 
+kubectl delete networkpolicies nginx-nw-policy
+
+
+
+** 
+Task >> 
+>> Write a nw policy with name
+- db-nw-policy
+- pods should accessible by role=db
+  ingress rules must be like below
+- pods present in dev namespace and role=frontend
+  allowed to communicate on port no 6379
+
+Egress rules
+- pods can communicate in default namespace
+- between ports 30000-32768
+- cidr block from 172.16.0.0/12 except 172.16.1.0/24
+
