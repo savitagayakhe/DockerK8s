@@ -26,3 +26,5 @@ Name the Pod alpine-pod-pod
 Use alpine:latest image
 Container name alpine-container
 Configure the container to execute the tail -f /config/log.txt command(using args ) with /bin/sh (using command ) to continuously monitor and display the contents of a log file.
+
+Created alpine pod is going in "Completed" status or ImagePullBackoff.
