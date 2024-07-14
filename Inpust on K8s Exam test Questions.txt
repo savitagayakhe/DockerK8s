@@ -1,0 +1,28 @@
+Please help with your inputs on Exam test questions
+
+-------------------------------------------------------------------------------------
+
+1) Find the pod that consumes the most CPU in all namespace(including kube-system) in all cluster(currently we have single cluster). Then, store the result in the file high_cpu_pod.txt with the following format: pod_name,namespace .
+
+Run top command for pod (for all pods under all namespaces)
+
+kubectl top pods --all-namespaces 
+
+If asked for sort use below command
+
+kubectl top pods --sort-by=cpu or mem --all-namespaces
+
+store the output in file- high_cpu_pod.txt with the following format: pod_name,namespace
+
+How to format store?
+
+-------------------------------------------------------------------------------------
+
+2) Create a Kubernetes Pod configuration to facilitate real-time monitoring of a log file. Specifically, you need to set up a Pod named alpine-pod-pod that runs an Alpine Linux container.
+
+Requirements:
+
+Name the Pod alpine-pod-pod
+Use alpine:latest image
+Container name alpine-container
+Configure the container to execute the tail -f /config/log.txt command(using args ) with /bin/sh (using command ) to continuously monitor and display the contents of a log file.
