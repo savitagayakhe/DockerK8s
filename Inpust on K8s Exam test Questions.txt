@@ -15,7 +15,17 @@ kubectl top pods --sort-by=cpu or mem --all-namespaces
 store the output in file- high_cpu_pod.txt with the following format: pod_name,namespace
 
 How to format store?
+>>controlplane $ kubectl get pods -A -o custom-columns=POD-NAME:.metadata.name,NAMESPACE:.metadata.namespace > pod.txt
+controlplane $ cat pod.txt
+POD-NAME                                   NAMESPACE
+nginx-bf5d5cf98-f8hp8                      default
+nginx-bf5d5cf98-kgrls                      default
+calico-kube-controllers-75bdb5b75d-2b6mr   kube-system
+canal-q652m                                kube-system
+canal-wzjz6                                kube-system
+coredns-5c69dbb7bd-6xvhl                   kube-system
 
+** SEE if this is how you want...
 -------------------------------------------------------------------------------------
 
 2) Create a Kubernetes Pod configuration to facilitate real-time monitoring of a log file. Specifically, you need to set up a Pod named alpine-pod-pod that runs an Alpine Linux container.
@@ -28,3 +38,22 @@ Container name alpine-container
 Configure the container to execute the tail -f /config/log.txt command(using args ) with /bin/sh (using command ) to continuously monitor and display the contents of a log file.
 
 Created alpine pod is going in "Completed" status or ImagePullBackoff.
+** TRY THIS
+
+controlplane $ cat alpine.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine-pod-pod
+spec:
+  containers:
+  - name: alpine-container
+    image: alpine:latest
+    command: ["/bin/sh"] ## command to run shell inside container
+    args:   [ "-c", "while true; do tail -f /config/log.txt; sleep 10;done" ]
+           # args: ["-c" >> command to run in shell
+           # tail will work only single time and conatiner would stop so need to loop it so while loop 
+
+controlplane $ kubectl get pods | grep alpine
+alpine-pod-pod          1/1     Running   0          3m35s
+
