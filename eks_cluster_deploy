@@ -1,0 +1,221 @@
+https://aws.amazon.com/outposts/rack/pricing/
+
+https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
+
+A. Create required roles
+**Create  access key and secret access key for root(aws) user
+
+1. Create role >> aws service 
+                service/usecase >> eks-cluster >>
+       next
+   Rolename=eksClusterRole
+Create role
+
+2. For nodeGroup
+  Create role >> name>>node-group01 >> ec2
+              select policies >> 		1.AmazonEC2ContainerRegistryReadOnly
+		2.AmazonEKS_CNI_Policy
+		3.AmazonEKSWorkerNodePolicy
+  Cretae role
+
+
+B. Create EKS cluster
+1. From Dashboard >> type eks
+   Creat cluster
+   Name >> k8s
+   Select role created in step-A-1
+    Will take around 15-16 mins
+2. Once cluster is in active state >> go to compute
+  add node group >>node01 >> NodeIAMrole>> select node-group01(created in Step-A-2)
+
+3. NOde-group Compute Configuration
+   Amazone linux2 (AL2_x86_64)
+   Capacity type >> on demand
+   Instance TYpe >> t3.medium
+   Rest leave as it is
+  next >>Specify network >> next
+  Review and create
+
+Will take 8-10 min >> once its active
+
+C. On Local System(linux) Install aws cli and kubectl
+
+C1>> Install Kubectl
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management
+
+ #curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+
+# sudo apt-get update
+#sudo apt-get install -y kubectl
+
+
+C2>> Install AWS
+sudo apt -y update
+sudo apt -y install unzip curl
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+TO INSTALL
+# ./aws/install -i /usr/local/aws-cli -b /usr/local/bin
+
+To verify
+# aws --version
+aws-cli/2.17.21 Python/3.11.9 Linux/6.5.0-35-generic exe/x86_64.ubuntu.22
+
+D. Configure aws account on local termial 
+root@ubuntu-virtual-machine:~# aws configure
+AWS Access Key ID [None]: 
+AWS Secret Access Key [None]: 
+Default region name [None]: us-east-2
+Default output format [None]: json
+
+E. to connect to k8s(cluster_name)
+# aws eks --region us-east-2 update-kubeconfig --name k8s
+Added new context arn:aws:eks:us-east-2:021891579620:cluster/k8s to /root/.kube/config
+
+
+To verify
+# kubectl get nodes
+NAME                                          STATUS   ROLES    AGE   VERSION
+ip-172-31-14-11.us-east-2.compute.internal    Ready    <none>   91m   v1.30.2-eks-1552ad0
+ip-172-31-32-135.us-east-2.compute.internal   Ready    <none>   91m   v1.30.2-eks-1552ad0
+
+=================================================================
+Deploy Eks cluster
+From cluster
+
+
+Kubectl create ns app-ns
+kubectl get ns
+create deployment file {add ns name in the file}
+
+vi app-deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: app-ns
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+Apply file to create deployment
+
+# kubectl apply -f app-deployment.yaml 
+
+
+To expose application
+kubectl expose deployment app-deployment -n app-ns --type=LoadBalancer --port=80
+>> Service must created check it
+kubectl get svc -n app-ns
+
+Now copy external_ip(Dns name of LB) thing and paste in url
+>> application is shown
+>> successfully deployed app using aws eks
+
+=====================================================================
+
+>> We cant share LB name to customers so must have domain name
+
+Now we need to do it using Ingress Controller
+1. Domain name is required with route53 entries
+
+GO to route53 from aws dashboard
+Create hostedzone
+create a record 
+     recordname recordtype A
+     Alias
+     route traffic to >> alias to app and classic LB
+     choose region us East
+     Paste LB_dns(url without https://) in choose LB section
+     Routing policy >> simple
+     Create record
+View record >> will take some time
+Once DOne
+>> Check using domain name if application is accessible
+================================================================
+Edit service to expose to ClusterIP
+
+kubectl edit svc deployment -n ns 
+using vi remove LB name(aws provided)
+
+type:ClusterIP
+remove  below things
+status:
+  loadBalancer:
+    ingress:
+    - hostname:
+save and exit
+
+Check Svc >> must be now clusterIP
+==============================================================
+
+from cluster
+wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/nlb-with-tls-termination.yaml
+
+Open file using vi
+vi deploy.yaml
+>> in file look for proxy-ip-cidr replace it with vpc-cidr
+to get vpc-cidr
+   Go to eks cluster GUI >> networking >> Your vpc's 
+       eks1-vpc >> check ip/cidr copy it
+paste in in proxy-ip-cidr will look like something below
+proxy-real-ip-cidr: 10.0.0.0/16
+
+In service section below
+check for aws-load-balancer-ssl-cert:PUT_ARN_OF_CErtificate
+>>to get ARN-of certificate
+  from aws dashboard >> certificate manager >>click on certificate>>
+copy arn and paste in the file
+
+save and exit from file
+kubectl create -f deploy.yaml
+
+To create ingress-resource
+vi ingress-resource.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  namespace: ns_name
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: <Add-domain> example.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: app-deployment <Deployment_name>
+            port:
+              number: 80
+
+save and exit
+
+Apply this file
+
+Kubectl apply -f ingress-resource.yaml
+kubectl get ingress -n ns
+>> its visible
+Describe it
+
