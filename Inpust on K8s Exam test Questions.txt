@@ -57,3 +57,97 @@ spec:
 controlplane $ kubectl get pods | grep alpine
 alpine-pod-pod          1/1     Running   0          3m35s
 
+
+-------------------------------------------------------------------------------------------------------------------------
+
+Question No 3- The deployment named video-app has experienced multiple rolling updates and rollbacks. Your task is to total revision of this deployment and record the image name used in 3rd revision to file app-file.txt in this format REVISION_TOTAL_COUNT,IMAGE_NAME .
+
+Deployment yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+  creationTimestamp: "2024-08-12T16:25:12Z"
+  generation: 3
+  labels:
+    app: video-app
+  name: video-app
+  namespace: default
+  resourceVersion: "2490"
+  uid: 795fc837-1a7b-4b78-b066-c1e70806d2b9
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: video-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+	   app: video-app
+    spec:
+      containers:
+      - image: redis:7.0.13
+        imagePullPolicy: IfNotPresent
+        name: redis
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-08-12T16:25:27Z"
+    lastUpdateTime: "2024-08-12T16:25:27Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-08-12T16:25:12Z"
+    lastUpdateTime: "2024-08-12T16:25:42Z"
+    message: ReplicaSet "video-app-7f5bc58cd6" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+	 observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+  
+kubectl get deployment video-app -o custom-columns=REVISION_TOTAL_COUNT:.metadata.generation,IMAGE_NAME:.'.spec.containers[0].image' > app-file.txt
+ 
+cat app-file.txt
+ 
+REVISION_TOTAL_COUNT   IMAGE_NAME
+3                      redis:7.0.13
+
+kubectl get deployment video-app -o custom-columns=REVISION_TOTAL_COUNT:.status.observedGeneration,IMAGE_NAME:.'.spec
+.containers[0].image' > app-file.txt
+
+cat app-file.txt 
+REVISION_TOTAL_COUNT   IMAGE_NAME
+3                      redis:7.0.13
+
+Using both metadata.generation and status.observedGeneration still validation fails of this question on the KillrKoda
+
+TRAINER INPUTS:
+
+??
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
