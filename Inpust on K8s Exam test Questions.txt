@@ -127,7 +127,8 @@ status:
   readyReplicas: 1
   replicas: 1
   updatedReplicas: 1
-  
+
+- Command to collect the output in file using REVISION_TOTAL_COUNT:.metadata.generation
 kubectl get deployment video-app -o custom-columns=REVISION_TOTAL_COUNT:.metadata.generation,IMAGE_NAME:.'.spec.containers[0].image' > app-file.txt
  
 cat app-file.txt
@@ -135,6 +136,7 @@ cat app-file.txt
 REVISION_TOTAL_COUNT   IMAGE_NAME
 3                      redis:7.0.13
 
+- Command to collect the output in file using REVISION_TOTAL_COUNT:.status.observedGeneration
 kubectl get deployment video-app -o custom-columns=REVISION_TOTAL_COUNT:.status.observedGeneration,IMAGE_NAME:.'.spec
 .containers[0].image' > app-file.txt
 
@@ -352,10 +354,6 @@ deployment.apps "cache-deployment" deleted
 
 - Edit the created dp.yaml to update values of the MaxUnavailable field to 30% and the MaxSurge field to 45% 
 vi dp.yaml 
-
-Below section need to be updated
-
-
 
 -Now apply the updated dp.yaml file to create deployment
 kubectl apply -f dp.yaml 
