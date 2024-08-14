@@ -60,7 +60,8 @@ alpine-pod-pod          1/1     Running   0          3m35s
 
 -------------------------------------------------------------------------------------------------------------------------
 
-Question No 3- The deployment named video-app has experienced multiple rolling updates and rollbacks. Your task is to total revision of this deployment and record the image name used in 3rd revision to file app-file.txt in this format REVISION_TOTAL_COUNT,IMAGE_NAME .
+Question No 3- 
+The deployment named video-app has experienced multiple rolling updates and rollbacks. Your task is to total revision of this deployment and record the image name used in 3rd revision to file app-file.txt in this format REVISION_TOTAL_COUNT,IMAGE_NAME .
 
 Deployment yaml
 
@@ -141,7 +142,7 @@ cat app-file.txt
 REVISION_TOTAL_COUNT   IMAGE_NAME
 3                      redis:7.0.13
 
-Using both metadata.generation and status.observedGeneration still validation fails of this question on the KillrKoda
+ISSUE- Using both metadata.generation and status.observedGeneration still validation fails of this question on the KillrKoda. Am I missing something in collecting this output?
 
 TRAINER INPUTS:
 
@@ -149,5 +150,165 @@ TRAINER INPUTS:
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Question No 4- 
+Due to a missing feature in the current version. To resolve this issue, perform a rollback of the deployment redis-deployment to the previous version. After rolling back the deployment, save the image currently in use to the rolling-back-image.txt file, and finally increase the replica count to 3 
 
+kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+redis-deployment   1/1     1            1           24s
+
+kubectl get rs
+NAME                          DESIRED   CURRENT   READY   AGE
+redis-deployment-66c8689579   1         1         1       26s
+redis-deployment-66f7989d     0         0         0       29s
+
+kubectl describe deployment redis-deployment
+Name:                   redis-deployment
+Namespace:              default
+CreationTimestamp:      Wed, 14 Aug 2024 14:34:25 +0000
+Labels:                 app=redis-deployment
+Annotations:            deployment.kubernetes.io/revision: 2
+Selector:               app=redis-deployment
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=redis-deployment
+  Containers:
+   redis:
+    Image:         redis:7.2.1
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  redis-deployment-66f7989d (0/0 replicas created)
+NewReplicaSet:   redis-deployment-66c8689579 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  42s   deployment-controller  Scaled up replica set redis-deployment-66f7989d to 1
+  Normal  ScalingReplicaSet  39s   deployment-controller  Scaled up replica set redis-deployment-66c8689579 to 1
+  Normal  ScalingReplicaSet  27s   deployment-controller  Scaled down replica set redis-deployment-66f7989d to 0 from 1
+
+kubectl rollout undo deployment redis-deployment
+deployment.apps/redis-deployment rolled back
+
+kubectl rollout status deployment redis-deployment
+deployment "redis-deployment" successfully rolled out
+
+kubectl describe redis-deployment
+error: the server doesn't have a resource type "redis-deployment"
+controlplane $ kubectl describe deployment redis-deployment 
+Name:                   redis-deployment
+Namespace:              default
+CreationTimestamp:      Wed, 14 Aug 2024 14:34:25 +0000
+Labels:                 app=redis-deployment
+Annotations:            deployment.kubernetes.io/revision: 3
+Selector:               app=redis-deployment
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=redis-deployment
+  Containers:
+   redis:
+    Image:         redis:7.0.13
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  redis-deployment-66c8689579 (0/0 replicas created)
+NewReplicaSet:   redis-deployment-66f7989d (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  107s  deployment-controller  Scaled up replica set redis-deployment-66f7989d to 1
+  Normal  ScalingReplicaSet  104s  deployment-controller  Scaled up replica set redis-deployment-66c8689579 to 1
+  Normal  ScalingReplicaSet  92s   deployment-controller  Scaled down replica set redis-deployment-66f7989d to 0 from 1
+  Normal  ScalingReplicaSet  39s   deployment-controller  Scaled up replica set redis-deployment-66f7989d to 1 from 0
+  Normal  ScalingReplicaSet  36s   deployment-controller  Scaled down replica set redis-deployment-66c8689579 to 0 from 1
+
+kubectl get deployment redis-deployment -o custom-columns=IMAGE_NAME:.'.spec.containers[0].image' > rolling-back-image.txt
+
+cat rolling-back-image.txt 
+
+Output
+
+IMAGE_NAME
+redis:7.0.13
+
+kubectl scale deployment redis-deployment --replicas=3
+deployment.apps/redis-deployment scaled
+
+kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+redis-deployment   3/3     3            3           2m53s
+
+kubectl describe deployment redis-deployment
+Name:                   redis-deployment
+Namespace:              default
+CreationTimestamp:      Wed, 14 Aug 2024 14:34:25 +0000
+Labels:                 app=redis-deployment
+Annotations:            deployment.kubernetes.io/revision: 3
+Selector:               app=redis-deployment
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=redis-deployment
+  Containers:
+   redis:
+    Image:         redis:7.0.13
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  redis-deployment-66c8689579 (0/0 replicas created)
+NewReplicaSet:   redis-deployment-66f7989d (3/3 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  5m22s  deployment-controller  Scaled up replica set redis-deployment-66f7989d to 1
+  Normal  ScalingReplicaSet  5m19s  deployment-controller  Scaled up replica set redis-deployment-66c8689579 to 1
+  Normal  ScalingReplicaSet  5m7s   deployment-controller  Scaled down replica set redis-deployment-66f7989d to 0 from 1
+  Normal  ScalingReplicaSet  4m14s  deployment-controller  Scaled up replica set redis-deployment-66f7989d to 1 from 0
+  Normal  ScalingReplicaSet  4m11s  deployment-controller  Scaled down replica set redis-deployment-66c8689579 to 0 from 1
+  Normal  ScalingReplicaSet  2m37s  deployment-controller  Scaled up replica set redis-deployment-66f7989d to 3 from 1
+
+ISSUE- Validation for this question still failed in KillrCoda. Am I missing some step or incorrect steps followed in answering this question?
+
+TRAINER INPUTS:
+
+??
+
+------------------------------------------------------------------------------------------------------------------------
+
+Question No 5-
 
