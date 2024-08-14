@@ -312,3 +312,310 @@ TRAINER INPUTS:
 
 Question No 5-
 
+Question-
+Create a new deployment named cache-deployment in the default namespace using a custom image redis:7.0.13 . Ensure that the deployment has the following specifications:
+
+Set the replica count to 2 .
+Set the strategy type RollingUpdate
+Configure the MaxUnavailable field to 30% and the MaxSurge field to 45% .
+Deploy the cache-deployment deployment and ensure that all pods are in a ready state.
+Now, Perform an image upgrade to redis:7.2.1 .
+Examine the rolling history of the deployment, and save the Total revision count to the total-revision.txt .
+
+- Check the exisitng deployment
+kubectl get deployments
+Output
+
+No resources found in default namespace.
+
+- Create the deployment first with with running pods
+kubectl create deployment cache-deployment --image=redis:7.0.13 --replicas=2
+
+Output
+deployment.apps/cache-deployment created
+
+-Check the created deployment
+kubectl get deployments
+
+Output
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+cache-deployment   2/2     2            2           13s
+
+- Create the yaml from the above created deployment
+kubectl get deployments cache-deployment -o yaml > dp.yaml
+
+- Now delete the deployment created
+kubectl delete deployment cache-deployment
+
+Output
+deployment.apps "cache-deployment" deleted
+
+- Edit the created dp.yaml to update values of the MaxUnavailable field to 30% and the MaxSurge field to 45% 
+vi dp.yaml 
+
+Below section need to be updated
+
+
+
+-Now apply the updated dp.yaml file to create deployment
+kubectl apply -f dp.yaml 
+
+Output
+deployment.apps/cache-deployment created
+
+- Check the created deployment
+kubectl get deployments
+
+Output
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+cache-deployment   2/2     2            2           5s
+
+- Describe the created deployemnt to check the updated MaxUnavailable field to 30% and the MaxSurge field to 45% values
+
+kubectl describe deployment cache-deployment
+
+Output
+Name:                   cache-deployment
+Namespace:              default
+CreationTimestamp:      Wed, 14 Aug 2024 16:39:25 +0000
+Labels:                 app=cache-deployment
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=cache-deployment
+Replicas:               2 desired | 2 updated | 2 total | 2 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  30% max unavailable, 45% max surge
+Pod Template:
+  Labels:  app=cache-deployment
+  Containers:
+   redis:
+    Image:         redis:7.0.13
+    Port:          <none>
+    Host Port:     <none>
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   cache-deployment-677589fbdc (2/2 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  18s   deployment-controller  Scaled up replica set cache-deployment-677589fbdc to 2
+
+- Update the image of deployment as mention in instructions
+kubectl set image deployment cache-deployment redis=redis:7.2.1
+
+Output
+deployment.apps/cache-deployment image updated
+
+- Check the rollout status of the deployment
+kubectl rollout status deployment cache-deployment
+
+Output
+deployment "cache-deployment" successfully rolled out
+
+- Check the pods running
+kubectl get pods
+
+Output
+NAME                                READY   STATUS    RESTARTS   AGE
+cache-deployment-857c5c455b-c7nwp   1/1     Running   0          22s
+cache-deployment-857c5c455b-jdq2j   1/1     Running   0          29s
+
+- Describe both the pods to make sure images is updated
+
+kubectl describe pod cache-deployment-857c5c455b-c7nwp
+
+Output
+Name:             cache-deployment-857c5c455b-c7nwp
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             node01/172.30.2.2
+Start Time:       Wed, 14 Aug 2024 16:40:31 +0000
+Labels:           app=cache-deployment
+                  pod-template-hash=857c5c455b
+Annotations:      cni.projectcalico.org/containerID: 01a1855a6530481eb14838eaf891fc235bad1b158707631f7956a80614213dab
+                  cni.projectcalico.org/podIP: 192.168.1.9/32
+                  cni.projectcalico.org/podIPs: 192.168.1.9/32
+Status:           Running
+IP:               192.168.1.9
+IPs:
+  IP:           192.168.1.9
+Controlled By:  ReplicaSet/cache-deployment-857c5c455b
+Containers:
+  redis:
+    Container ID:   containerd://c5bab607b49983545fc1380ff11a0662adf6c5a97a8c7b2e01736fd4f2ae3aa8
+    Image:          redis:7.2.1
+    Image ID:       docker.io/library/redis@sha256:4ca2a277f1dc3ddd0da33a258096de9a1cf5b9d9bd96b27ee78763ee2248c28c
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 14 Aug 2024 16:40:32 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pdnqk (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-pdnqk:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  18m   default-scheduler  Successfully assigned default/cache-deployment-857c5c455b-c7nwp to node01
+  Normal  Pulled     18m   kubelet            Container image "redis:7.2.1" already present on machine
+  Normal  Created    18m   kubelet            Created container redis
+  Normal  Started    18m   kubelet            Started container redis
+
+kubectl describe pod cache-deployment-857c5c455b-jdq2j
+
+Output
+Name:             cache-deployment-857c5c455b-jdq2j
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             node01/172.30.2.2
+Start Time:       Wed, 14 Aug 2024 16:40:23 +0000
+Labels:           app=cache-deployment
+                  pod-template-hash=857c5c455b
+Annotations:      cni.projectcalico.org/containerID: f90013a4c54722583b44c4a6d0ceff2ebdf8959472023720bfcf82b34a36421f
+                  cni.projectcalico.org/podIP: 192.168.1.8/32
+                  cni.projectcalico.org/podIPs: 192.168.1.8/32
+Status:           Running
+IP:               192.168.1.8
+IPs:
+  IP:           192.168.1.8
+Controlled By:  ReplicaSet/cache-deployment-857c5c455b
+Containers:
+  redis:
+    Container ID:   containerd://948818fd39825e484275f7e2f60fb77807c61e9f02263c9c921f44859120b208
+    Image:          redis:7.2.1
+    Image ID:       docker.io/library/redis@sha256:4ca2a277f1dc3ddd0da33a258096de9a1cf5b9d9bd96b27ee78763ee2248c28c
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 14 Aug 2024 16:40:29 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dbmzt (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-dbmzt:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  19m   default-scheduler  Successfully assigned default/cache-deployment-857c5c455b-jdq2j to node01
+  Normal  Pulling    19m   kubelet            Pulling image "redis:7.2.1"
+  Normal  Pulled     19m   kubelet            Successfully pulled image "redis:7.2.1" in 4.933s (4.933s including waiting). Image size: 51443557 bytes.
+  Normal  Created    19m   kubelet            Created container redis
+  Normal  Started    19m   kubelet            Started container redis
+
+- Check the rollout history of deployment
+kubectl rollout history deployment cache-deployment
+
+Output
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+- Check the REVISION detail of deployment
+kubectl rollout history deployment cache-deployment --revision=1 
+
+Output
+Pod Template:
+  Labels:       app=cache-deployment
+        pod-template-hash=677589fbdc
+  Containers:
+   redis:
+    Image:      redis:7.0.13
+    Port:       <none>
+    Host Port:  <none>
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+  Node-Selectors:       <none>
+  Tolerations:  <none>
+
+kubectl rollout history deployment cache-deployment --revision=2
+
+Output
+Pod Template:
+  Labels:       app=cache-deployment
+        pod-template-hash=857c5c455b
+  Containers:
+   redis:
+    Image:      redis:7.2.1
+    Port:       <none>
+    Host Port:  <none>
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+  Node-Selectors:       <none>
+  Tolerations:  <none>
+
+- Now save total revision output to mention file-  total-revision.txt
+kubectl get deployment cache-deployment -o custom-columns=REVISION:.status.observedGeneration > total-revision.txt
+
+- Check the created total-revision.txt
+cat total-revision.txt
+
+Output
+REVISION
+2
+
+ISSUE- Is the command use for the REVISION is correct or this output should show the revision like below
+       
+       Output
+       REVISION
+       1         
+       2
+       Can you please help to get command right if above output is expected.
+
+TRAINER INPUTS:
+
+??
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+
