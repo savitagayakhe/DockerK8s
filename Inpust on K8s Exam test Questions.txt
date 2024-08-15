@@ -615,5 +615,288 @@ TRAINER INPUTS:
 
 --------------------------------------------------------------------------------------------------------------------
 
+Question No- 6
+
+Question-
+something is not working at the moment on controlplane node(Cause NotReady state), check that and etcd-controlplane pod is running in kube-system environment, take backup and store it in /opt/cluster_backup.db file, and also store backup console output store it in backup.txt
+
+ssh controlplane
+
+- Check the nodes
+
+Kubectl get nodes
+
+Output
+NAME           STATUS     ROLES           AGE   VERSION
+controlplane   NotReady   control-plane   12d   v1.30.0
+node01         Ready      <none>          12d   v1.30.0
+
+- Check describe node
+kubectl describe node controlplane
+
+output
+Name:               controlplane
+Roles:              control-plane
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=controlplane
+                    kubernetes.io/os=linux
+                    node-role.kubernetes.io/control-plane=
+                    node.kubernetes.io/exclude-from-external-load-balancers=
+Annotations:        flannel.alpha.coreos.com/backend-data: {"VNI":1,"VtepMAC":"c2:73:4f:c6:c9:07"}
+                    flannel.alpha.coreos.com/backend-type: vxlan
+                    flannel.alpha.coreos.com/kube-subnet-manager: true
+                    flannel.alpha.coreos.com/public-ip: 172.30.1.2
+                    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    projectcalico.org/IPv4Address: 172.30.1.2/24
+                    projectcalico.org/IPv4IPIPTunnelAddr: 192.168.0.1
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Fri, 02 Aug 2024 07:24:51 +0000
+Taints:             node.kubernetes.io/unreachable:NoExecute
+                    node-role.kubernetes.io/control-plane:NoSchedule
+                    node.kubernetes.io/unreachable:NoSchedule
+Unschedulable:      false
+Lease:
+  HolderIdentity:  controlplane
+  AcquireTime:     <unset>
+  RenewTime:       Thu, 15 Aug 2024 06:18:59 +0000
+Conditions:
+  Type                 Status    LastHeartbeatTime                 LastTransitionTime                Reason              Message
+  ----                 ------    -----------------                 ------------------                ------              -------
+  NetworkUnavailable   False     Thu, 15 Aug 2024 06:16:17 +0000   Thu, 15 Aug 2024 06:16:17 +0000   FlannelIsUp         Flannel is running on this node
+  MemoryPressure       Unknown   Thu, 15 Aug 2024 06:16:05 +0000   Thu, 15 Aug 2024 06:19:40 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+  DiskPressure         Unknown   Thu, 15 Aug 2024 06:16:05 +0000   Thu, 15 Aug 2024 06:19:40 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+  PIDPressure          Unknown   Thu, 15 Aug 2024 06:16:05 +0000   Thu, 15 Aug 2024 06:19:40 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+  Ready                Unknown   Thu, 15 Aug 2024 06:16:05 +0000   Thu, 15 Aug 2024 06:19:40 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+Addresses:
+  InternalIP:  172.30.1.2
+  Hostname:    controlplane
+Capacity:
+  cpu:                1
+  ephemeral-storage:  20134592Ki
+  hugepages-2Mi:      0
+  memory:             2030940Ki
+  pods:               110
+Allocatable:
+  cpu:                1
+  ephemeral-storage:  19586931083
+  hugepages-2Mi:      0
+  memory:             1928540Ki
+  pods:               110
+System Info:
+  Machine ID:                 388a2d0f867a4404bc12a0093bd9ed8d
+  System UUID:                e2d398c7-3130-4bbf-a33d-6ea6ba056c4d
+  Boot ID:                    7324948c-75af-4ea6-8c8b-0383ba319ca3
+  Kernel Version:             5.4.0-131-generic
+  OS Image:                   Ubuntu 20.04.5 LTS
+  Operating System:           linux
+  Architecture:               amd64
+  Container Runtime Version:  containerd://1.7.13
+  Kubelet Version:            v1.30.0
+  Kube-Proxy Version:         v1.30.0
+PodCIDR:                      192.168.0.0/24
+PodCIDRs:                     192.168.0.0/24
+Non-terminated Pods:          (8 in total)
+  Namespace                   Name                                        CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+  ---------                   ----                                        ------------  ----------  ---------------  -------------  ---
+  kube-system                 calico-kube-controllers-75bdb5b75d-kh2wj    0 (0%)        0 (0%)      0 (0%)           0 (0%)         12d
+  kube-system                 canal-rc7zk                                 25m (2%)      0 (0%)      0 (0%)           0 (0%)         12d
+  kube-system                 etcd-controlplane                           25m (2%)      0 (0%)      100Mi (5%)       0 (0%)         12d
+  kube-system                 kube-apiserver-controlplane                 50m (5%)      0 (0%)      0 (0%)           0 (0%)         12d
+  kube-system                 kube-controller-manager-controlplane        25m (2%)      0 (0%)      0 (0%)           0 (0%)         12d
+  kube-system                 kube-proxy-6xsx9                            0 (0%)        0 (0%)      0 (0%)           0 (0%)         12d
+  kube-system                 kube-scheduler-controlplane                 25m (2%)      0 (0%)      0 (0%)           0 (0%)         12d
+  local-path-storage          local-path-provisioner-75655fcf79-s7bbc     0 (0%)        0 (0%)      0 (0%)           0 (0%)         12d
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests    Limits
+  --------           --------    ------
+  cpu                150m (15%)  0 (0%)
+  memory             100Mi (5%)  0 (0%)
+  ephemeral-storage  0 (0%)      0 (0%)
+  hugepages-2Mi      0 (0%)      0 (0%)
+Events:
+  Type    Reason                   Age                From             Message
+  ----    ------                   ----               ----             -------
+  Normal  Starting                 11m                kube-proxy       
+  Normal  Starting                 12d                kube-proxy       
+  Normal  Starting                 12d                kube-proxy       
+  Normal  Starting                 12d                kubelet          Starting kubelet.
+  Normal  NodeHasSufficientMemory  12d                kubelet          Node controlplane status is now: NodeHasSufficientMemory
+  Normal  NodeHasNoDiskPressure    12d                kubelet          Node controlplane status is now: NodeHasNoDiskPressure
+  Normal  NodeHasSufficientPID     12d                kubelet          Node controlplane status is now: NodeHasSufficientPID
+  Normal  NodeAllocatableEnforced  12d                kubelet          Updated Node Allocatable limit across pods
+  Normal  RegisteredNode           12d                node-controller  Node controlplane event: Registered Node controlplane in Controller
+  Normal  NodeReady                12d                kubelet          Node controlplane status is now: NodeReady
+  Normal  RegisteredNode           12d                node-controller  Node controlplane event: Registered Node controlplane in Controller
+  Normal  Starting                 12d                kubelet          Starting kubelet.
+  Normal  NodeAllocatableEnforced  12d                kubelet          Updated Node Allocatable limit across pods
+  Normal  NodeHasSufficientMemory  12d (x8 over 12d)  kubelet          Node controlplane status is now: NodeHasSufficientMemory
+  Normal  NodeHasNoDiskPressure    12d (x8 over 12d)  kubelet          Node controlplane status is now: NodeHasNoDiskPressure
+  Normal  NodeHasSufficientPID     12d (x7 over 12d)  kubelet          Node controlplane status is now: NodeHasSufficientPID
+  Normal  RegisteredNode           12d                node-controller  Node controlplane event: Registered Node controlplane in Controller
+  Normal  Starting                 12m                kubelet          Starting kubelet.
+  Normal  NodeHasSufficientMemory  12m (x8 over 12m)  kubelet          Node controlplane status is now: NodeHasSufficientMemory
+  Normal  NodeHasNoDiskPressure    12m (x8 over 12m)  kubelet          Node controlplane status is now: NodeHasNoDiskPressure
+  Normal  NodeHasSufficientPID     12m (x7 over 12m)  kubelet          Node controlplane status is now: NodeHasSufficientPID
+  Normal  NodeAllocatableEnforced  12m                kubelet          Updated Node Allocatable limit across pods
+  Normal  RegisteredNode           11m                node-controller  Node controlplane event: Registered Node controlplane in Controller
+  Normal  NodeNotReady             8m21s              node-controller  Node controlplane status is now: NodeNotReady
+
+-Check the kubelet status
+systemctl status kubelet
+
+Output
+● kubelet.service - kubelet: The Kubernetes Node Agent
+     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    Drop-In: /usr/lib/systemd/system/kubelet.service.d
+             └─10-kubeadm.conf
+     Active: inactive (dead) since Thu 2024-08-15 06:19:04 UTC; 9min ago
+       Docs: https://kubernetes.io/docs/
+    Process: 1723 ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARG>
+   Main PID: 1723 (code=exited, status=0/SUCCESS)
+
+Aug 15 06:16:36 controlplane kubelet[1723]: E0815 06:16:36.862321    1723 pod_workers.go:1298] "Error syncing pod, skipping" err="f>
+Aug 15 06:16:36 controlplane kubelet[1723]: E0815 06:16:36.910688    1723 kuberuntime_manager.go:1075] "killPodWithSyncResult faile>
+Aug 15 06:16:36 controlplane kubelet[1723]: E0815 06:16:36.910730    1723 pod_workers.go:1298] "Error syncing pod, skipping" err="f>
+Aug 15 06:16:38 controlplane kubelet[1723]: I0815 06:16:38.475526    1723 kuberuntime_container_linux.go:167] "No swap cgroup contr>
+Aug 15 06:16:51 controlplane kubelet[1723]: I0815 06:16:51.689803    1723 kuberuntime_container_linux.go:167] "No swap cgroup contr>
+Aug 15 06:17:25 controlplane kubelet[1723]: I0815 06:17:25.932382    1723 scope.go:117] "RemoveContainer" containerID="d32198297c7b>
+Aug 15 06:17:25 controlplane kubelet[1723]: I0815 06:17:25.947833    1723 scope.go:117] "RemoveContainer" containerID="e7ccc675a38c>
+Aug 15 06:19:04 controlplane systemd[1]: Stopping kubelet: The Kubernetes Node Agent...
+Aug 15 06:19:04 controlplane systemd[1]: kubelet.service: Succeeded.
+Aug 15 06:19:04 controlplane systemd[1]: Stopped kubelet: The Kubernetes Node Agent.
+
+- Check journalctl for kubelet logs
+journalctl -xeu kubelet
+
+- Start the kubelet
+systemctl start kubelet
+
+- Check the status of kubelet (it should be running now)
+systemctl status kubelet
+
+Output
+controlplane $ systemctl status kubelet
+● kubelet.service - kubelet: The Kubernetes Node Agent
+     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    Drop-In: /usr/lib/systemd/system/kubelet.service.d
+             └─10-kubeadm.conf
+     Active: active (running) since Thu 2024-08-15 06:28:47 UTC; 2s ago
+       Docs: https://kubernetes.io/docs/
+   Main PID: 6885 (kubelet)
+      Tasks: 9 (limit: 2338)
+     Memory: 70.8M
+     CGroup: /system.slice/kubelet.service
+             └─6885 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kub>
+
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326358    6885 projected.go:294] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326418    6885 projected.go:200] Error preparing data for projected volu>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326472    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.751987    6885 configmap.go:199] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.752033    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852928    6885 projected.go:294] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852967    6885 projected.go:200] Error preparing data for projected volu>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852997    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:50 controlplane kubelet[6885]: I0815 06:28:50.339640    6885 pod_container_deletor.go:80] "Container not found in pod'>
+Aug 15 06:28:50 controlplane kubelet[6885]: I0815 06:28:50.340453    6885 scope.go:117] "RemoveContainer" containerID="ef118d86734d>
+...skipping...
+● kubelet.service - kubelet: The Kubernetes Node Agent
+     Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+    Drop-In: /usr/lib/systemd/system/kubelet.service.d
+             └─10-kubeadm.conf
+     Active: active (running) since Thu 2024-08-15 06:28:47 UTC; 2s ago
+       Docs: https://kubernetes.io/docs/
+   Main PID: 6885 (kubelet)
+      Tasks: 9 (limit: 2338)
+     Memory: 70.8M
+     CGroup: /system.slice/kubelet.service
+             └─6885 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kub>
+
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326358    6885 projected.go:294] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326418    6885 projected.go:200] Error preparing data for projected volu>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.326472    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.751987    6885 configmap.go:199] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.752033    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852928    6885 projected.go:294] Couldn't get configMap local-path-stora>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852967    6885 projected.go:200] Error preparing data for projected volu>
+Aug 15 06:28:49 controlplane kubelet[6885]: E0815 06:28:49.852997    6885 nestedpendingoperations.go:348] Operation for "{volumeNam>
+Aug 15 06:28:50 controlplane kubelet[6885]: I0815 06:28:50.339640    6885 pod_container_deletor.go:80] "Container not found in pod'>
+Aug 15 06:28:50 controlplane kubelet[6885]: I0815 06:28:50.340453    6885 scope.go:117] "RemoveContainer" containerID="ef118d86734d>
+
+- Check the nodes again (controlplane should be running)
+kubectl get nodes
+
+Output
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   12d   v1.30.0
+node01         Ready    <none>          12d   v1.30.0
+
+- Check the etcd pod under ns kube-system
+kubectl get pods -n kube-system
+NAME                                       READY   STATUS    RESTARTS      AGE
+calico-kube-controllers-75bdb5b75d-b7s29   1/1     Running   0             4m32s
+canal-rc7zk                                2/2     Running   2 (13m ago)   12d
+canal-rnmhk                                2/2     Running   2 (13m ago)   12d
+coredns-5c69dbb7bd-nzg9k                   1/1     Running   1 (13m ago)   12d
+coredns-5c69dbb7bd-pk85q                   1/1     Running   1 (13m ago)   12d
+etcd-controlplane                          1/1     Running   2 (13m ago)   12d
+kube-apiserver-controlplane                1/1     Running   2 (13m ago)   12d
+kube-controller-manager-controlplane       1/1     Running   2 (13m ago)   12d
+kube-proxy-6xsx9                           1/1     Running   2 (13m ago)   12d
+kube-proxy-vrwqx                           1/1     Running   1 (13m ago)   12d
+kube-scheduler-controlplane                1/1     Running   2 (13m ago)   12d
+
+- Take back of etcd to file name - /opt/cluster_backup.db
+ETCDCTL_API=3 etcdctl --endpoints=https://172.30.1.2:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key snapshot save /opt/cluster_backup.db
+
+Output
+{"level":"info","ts":1723703394.012537,"caller":"snapshot/v3_snapshot.go:68","msg":"created temporary db file","path":"/opt/cluster_backup.db.part"}
+{"level":"info","ts":1723703394.0245504,"logger":"client","caller":"v3/maintenance.go:211","msg":"opened snapshot stream; downloading"}
+{"level":"info","ts":1723703394.0247169,"caller":"snapshot/v3_snapshot.go:76","msg":"fetching snapshot","endpoint":"https://172.30.1.2:2379"}
+{"level":"info","ts":1723703394.113817,"logger":"client","caller":"v3/maintenance.go:219","msg":"completed snapshot read; closing"}
+{"level":"info","ts":1723703394.151719,"caller":"snapshot/v3_snapshot.go:91","msg":"fetched snapshot","endpoint":"https://172.30.1.2:2379","size":"4.7 MB","took":"now"}
+{"level":"info","ts":1723703394.1519723,"caller":"snapshot/v3_snapshot.go:100","msg":"saved","path":"/opt/cluster_backup.db"}
+Snapshot saved at /opt/cluster_backup.db
+
+- Check the backup status 
+export ETCDCTL_API=3
+etcdctl --write-out=table snapshot status /opt/cluster_backup.db  
+
+Output 
+Deprecated: Use `etcdutl snapshot status` instead.
+
++----------+----------+------------+------------+
+|   HASH   | REVISION | TOTAL KEYS | TOTAL SIZE |
++----------+----------+------------+------------+
+| bf6a6359 |     3506 |       1495 |     4.7 MB |
++----------+----------+------------+------------+
+
+- Now save this output to backup.txt file
+etcdctl --write-out=table snapshot status /opt/cluster_backup.db > backup.txt
+Deprecated: Use `etcdutl snapshot status` instead.
 
 
+- Check the backup.txt file
+cat backup.txt 
+
+Output
++----------+----------+------------+------------+
+|   HASH   | REVISION | TOTAL KEYS | TOTAL SIZE |
++----------+----------+------------+------------+
+| bf6a6359 |     3506 |       1495 |     4.7 MB |
++----------+----------+------------+------------+
+
+COMPLETED
+
+K8s Refernce Doc- https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/
+
+ISSUE- controlplane is in running state and backup creation is also successful with backup output captured backup.txt file, still validation fails. Did I missing any steps in fixing this issue?
+
+TRAINER INPUTS:
+
+??
+
+---------------------------------------------------------------------------------------------------------------------------
