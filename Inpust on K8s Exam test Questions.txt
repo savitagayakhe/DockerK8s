@@ -60,7 +60,8 @@ alpine-pod-pod          1/1     Running   0          3m35s
 
 -------------------------------------------------------------------------------------------------------------------------
 
-Question No 3- 
+Question No- 3
+
 The deployment named video-app has experienced multiple rolling updates and rollbacks. Your task is to total revision of this deployment and record the image name used in 3rd revision to file app-file.txt in this format REVISION_TOTAL_COUNT,IMAGE_NAME .
 
 Deployment yaml
@@ -152,7 +153,7 @@ TRAINER INPUTS:
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Question No 4- 
+Question No- 4 
 Due to a missing feature in the current version. To resolve this issue, perform a rollback of the deployment redis-deployment to the previous version. After rolling back the deployment, save the image currently in use to the rolling-back-image.txt file, and finally increase the replica count to 3 
 
 kubectl get deployments
@@ -312,7 +313,7 @@ TRAINER INPUTS:
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Question No 5-
+Question No- 5
 
 Question-
 Create a new deployment named cache-deployment in the default namespace using a custom image redis:7.0.13 . Ensure that the deployment has the following specifications:
@@ -900,3 +901,143 @@ TRAINER INPUTS:
 ??
 
 ---------------------------------------------------------------------------------------------------------------------------
+
+Question No- 7
+
+You have a service account named prod-sa , a Role named prod-role-cka , and a RoleBinding named prod-role-binding-cka . we are trying to create  list  and get  the services . However, using prod-sa service account is not able to perform these operations. fix this issue.
+
+- Check the exiting role
+kubectl get roles
+
+Output
+NAME            CREATED AT
+prod-role-cka   2024-08-15T14:22:16Z
+
+- Describe this role
+kubectl describe role prod-role-cka
+
+Output
+Name:         prod-role-cka
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources  Non-Resource URLs  Resource Names  Verbs
+  ---------  -----------------  --------------  -----
+  pods       []                 []              [list]
+
+-Check the existing rolebinding
+kubectl get rolebinding
+
+Output
+NAME                    ROLE                 AGE
+prod-role-binding-cka   Role/prod-role-cka   7m50s
+
+- Describe this rolebinding 
+kubectl describe rolebinding prod-role-binding-cka
+
+Output
+Name:         prod-role-binding-cka
+Labels:       <none>
+Annotations:  <none>
+Role:
+  Kind:  Role
+  Name:  prod-role-cka
+Subjects:
+  Kind            Name     Namespace
+  ----            ----     ---------
+  ServiceAccount  prod-sa  default
+
+- Check the existing sa
+kubectl get sa
+
+Output
+NAME      SECRETS   AGE
+default   0         13d
+prod-sa   0         8m36s
+
+- Describe this service account
+kubectl describe sa prod-sa
+
+Output
+Name:                prod-sa
+Namespace:           default
+Labels:              <none>
+Annotations:         <none>
+Image pull secrets:  <none>
+Mountable secrets:   <none>
+Tokens:              <none>
+Events:              <none>
+
+- Edit the role to update resource (update pod to services) and verb (missing create and get)
+kubectl edit role prod-role-cka
+
+Update yaml as below
+
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: "2024-08-15T14:22:16Z"
+  name: prod-role-cka
+  namespace: default
+  resourceVersion: "2930"
+  uid: 2f4b88ca-5836-4df9-b49b-56c0c088c29a
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  verbs:
+  - list
+  - get 
+  - create
+
+Save an exit
+
+Output
+role.rbac.authorization.k8s.io/prod-role-cka edited
+
+- Desrcibe the role again to confirm the resource and verb is updated
+kubectl describe role prod-role-cka
+
+Output
+Name:         prod-role-cka
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources  Non-Resource URLs  Resource Names  Verbs
+  ---------  -----------------  --------------  -----
+  pods       []                 []              [list get create]
+  services   []                 []              [list get create]
+
+
+- Run auth check command to see if you have the permisson now to get and create services
+
+kubectl auth can-i list services --as=system:serviceaccount:default:prod-sa
+yes
+
+kubectl auth can-i get services --as=system:serviceaccount:default:prod-sa
+yes
+
+kubectl auth can-i create services --as=system:serviceaccount:default:prod-sa
+yes
+
+kubectl auth can-i delete services --as=system:serviceaccount:default:prod-sa
+no
+
+
+ISSUE- Checking the kubectl auth I see permission are granted successfully but Validation for this question still failed in KillrCoda. Am I missing some step or incorrect steps followed in answering this question?
+
+TRAINER INPUTS:
+
+??
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
