@@ -60,7 +60,7 @@ alpine-pod-pod          1/1     Running   0          3m35s
 
 -------------------------------------------------------------------------------------------------------------------------
 
-Question No- 3
+Question No- 3 (Killercoda Link- https://killercoda.com/sachin/course/CKA/deployment-history)
 
 The deployment named video-app has experienced multiple rolling updates and rollbacks. Your task is to total revision of this deployment and record the image name used in 3rd revision to file app-file.txt in this format REVISION_TOTAL_COUNT,IMAGE_NAME .
 
@@ -153,7 +153,8 @@ TRAINER INPUTS:
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Question No- 4 
+Question No- 4 (Killercoda Link- https://killercoda.com/sachin/course/CKA/rollback)
+
 Due to a missing feature in the current version. To resolve this issue, perform a rollback of the deployment redis-deployment to the previous version. After rolling back the deployment, save the image currently in use to the rolling-back-image.txt file, and finally increase the replica count to 3 
 
 kubectl get deployments
@@ -313,7 +314,7 @@ TRAINER INPUTS:
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Question No- 5
+Question No- 5 (Killercoda Link- https://killercoda.com/sachin/course/CKA/deployment-rollout)
 
 Question-
 Create a new deployment named cache-deployment in the default namespace using a custom image redis:7.0.13 . Ensure that the deployment has the following specifications:
@@ -616,7 +617,7 @@ TRAINER INPUTS:
 
 --------------------------------------------------------------------------------------------------------------------
 
-Question No- 6
+Question No- 6 (Killercoda Link- https://killercoda.com/sachin/course/CKA/etcd-backup-issue)
 
 Question-
 something is not working at the moment on controlplane node(Cause NotReady state), check that and etcd-controlplane pod is running in kube-system environment, take backup and store it in /opt/cluster_backup.db file, and also store backup console output store it in backup.txt
