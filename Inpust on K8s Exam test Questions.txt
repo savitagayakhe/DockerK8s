@@ -150,7 +150,13 @@ ISSUE- Using both metadata.generation and status.observedGeneration still valida
 TRAINER INPUTS:
 
 ??
+******************************************************************************************************************
+TRY TO PUT all REVISION no and image name in the file i.e. output of 
+ kubectl rollout history deployment video-app as REvision_total_count and image name in file and then validate
+*******************************************************************************************************************
 
+
+ 
 ------------------------------------------------------------------------------------------------------------------------
 
 Question No- 4 (Killercoda Link- https://killercoda.com/sachin/course/CKA/rollback)
