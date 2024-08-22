@@ -151,8 +151,21 @@ TRAINER INPUTS:
 
 ??
 ******************************************************************************************************************
-TRY TO PUT all REVISION no and image name in the file i.e. output of 
- kubectl rollout history deployment video-app as REvision_total_count and image name in file and then validate
+controlplane $ kubectl config use-context kubernetes-admin@kubernetes
+Switched to context "kubernetes-admin@kubernetes".
+controlplane $ kubectl rollout history deployment video-app
+deployment.apps/video-app 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+3         <none>
+
+controlplane $ kubectl rollout history deployment video-app --revision=3
+controlplane $ echo "3,redis:7.0.13" > app-file.txt
+controlplane $ cat app-file.txt 
+3,redis:7.0.13
+
+>> This way its validating
 *******************************************************************************************************************
 
 
