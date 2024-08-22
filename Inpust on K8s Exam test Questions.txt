@@ -330,7 +330,12 @@ ISSUE- Validation for this question still failed in KillrCoda. Am I missing some
 TRAINER INPUTS:
 
 ??
-
+**********************************************************************
+here also just like above question try to manually echo image name from line no 278 into specified file name
+AS ALL STEPS ARE CORRECT i hope it should work
+I didnt try it 
+Do let me know if its validating or not
+REST QUESTIONS WILL CHECK LATER
 ------------------------------------------------------------------------------------------------------------------------
 
 Question No- 5 (Killercoda Link- https://killercoda.com/sachin/course/CKA/deployment-rollout)
