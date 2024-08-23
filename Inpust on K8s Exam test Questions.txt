@@ -328,8 +328,66 @@ Events:
 ISSUE- Validation for this question still failed in KillrCoda. Am I missing some step or incorrect steps followed in answering this question?
 
 TRAINER INPUTS:
+*********************************************************************************
+Tried all these way but its not validating
+1.Deployment Created using command
+$ kubectl create deployment cache-deployment --image=redis:7.0.13 --replicas=2 --dry-run=client -o yaml > cache-deployment.yaml
 
-??
+After editing file like below
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: cache-deployment
+  name: cache-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cache-deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 45%
+      maxUnavailable: 30%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: cache-deployment
+    spec:
+      containers:
+      - image: redis:7.0.13
+        name: redis
+        resources: {}
+status: {}
+
+2. file applied
+3. check deploymnet and described it
+4. chenged image 
+$ kubectl set image deployments/cache-deployment redis=redis:7.2.1
+5. Check rollout statuts and history
+
+
+6 . TO WRITE IN FILE I TRIED ALL  BELOW METHODS BUT NOT VALIDATING
+A.controlplane $ echo 2 > total-revision.txt
+controlplane $ cat total-revision.txt 
+2
+
+B.controlplane $ kubectl rollout history deployment cache-deployment > total-revision.txt
+controlplane $ cat total-revision.txt 
+deployment.apps/cache-deployment 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+C.controlplane $ kubectl get deployment cache-deployment -o custom-columns=REVISION:.status.observedGeneration > total-revision.txt
+controlplane $ cat total-revision.txt   
+REVISION
+2
+
+AT 6th step something is missing
 **********************************************************************
 here also just like above question try to manually echo image name from line no 278 into specified file name
 AS ALL STEPS ARE CORRECT i hope it should work
