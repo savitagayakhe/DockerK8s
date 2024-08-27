@@ -1031,7 +1031,18 @@ ISSUE- controlplane is in running state and backup creation is also successful w
 
 TRAINER INPUTS:
 
-??
+******************************************************************************************************
+During exam please perform only required things to save on time
+
+1. Just check node status
+2. check and start kubelet service
+3. chek if kubelet started and node status must be ready by now
+4 to take backup and store output of the command in backup.txt file
+$ etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key snapshot save /opt/cluster_backup.db &> backup.txt
+
+ITS VALIDATING ALSO
+
+****************************************************************************************************
 
 ---------------------------------------------------------------------------------------------------------------------------
 
