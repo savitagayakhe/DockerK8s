@@ -694,8 +694,58 @@ ISSUE- Is the command use for the REVISION is correct or this output should show
        Can you please help to get command right if above output is expected.
 
 TRAINER INPUTS:
+******************************************************************************************
+I tried this way (STILl at final stage its not validating)
 
-??
+1. create deployment yaml
+$ kubectl create deployment cache-deployment --image=redis:7.0.13 --replicas=2 --dry-run=client -o yaml > deployment.yaml
+controlplane $ ls
+deployment.yaml  filesystem  snap
+controlplane $ nano deployment.yaml 
+
+2. edit yaml to add stratesgy
+strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+     maxUnavailable: 30%
+     maxSurge: 45%
+
+3. controlplane $ kubectl apply -f deployment.yaml
+4. $ kubectl describe deployments.apps cache-deployment
+to verify image, replicas and strategy type set
+
+5.To set image
+$ kubectl set image deployment/cache-deployment redis=redis:7.2.1
+deployment.apps/cache-deployment image updated
+
+6.$ kubectl describe deployments.apps cache-deployment
+to veriy image updation
+
+7. All possible methods i tried to use to add in file
+controlplane $ kubectl rollout history deployment/cache-deployment
+deployment.apps/cache-deployment 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+controlplane $ echo 2 > total-revision.txt
+controlplane $ cat total-revision.txt 
+2
+controlplane $ nano total-revision.txt 
+controlplane $ cat total-revision.txt 
+1
+2
+controlplane $ echo "kubectl rollout history deployment cache-deployment" > total-revision.txt
+controlplane $ cat total-revision.txt 
+kubectl rollout history deployment cache-deployment
+controlplane $ echo $(kubectl rollout history deployment cache-deployment) > total-revision.txt
+controlplane $ cat total-revision.txt 
+deployment.apps/cache-deployment REVISION CHANGE-CAUSE 1 <none> 2 <none>
+controlplane $ nano total-revision.txt 
+controlplane $ cat total-revision.txt 
+ 1  2 
+***Not VALIDATED ******
+*******************************************************************************************8
 
 --------------------------------------------------------------------------------------------------------------------
 
