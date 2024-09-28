@@ -1,0 +1,14 @@
+1. Check the no of schedulable nodes and write no to a file, excluding tainted nodes
+2. Scale deployment to 4 replicas
+3. Create nw policy that allows access from nginx pod in dev namespace to redis pod in test namespace.
+4.Expose deployment as nodeport service on port 8080
+5. perform etcd backup on cluster on /etc/backup, once done restore backup using backup file given in /var/lib/etcd_bkp
+6. Create cluster role, cluster role binding and service account, cluster role that allows deployment, service and ds to be created in namespace test
+7. Make node unschedulable and move traffic to other nodes
+8. Create ingress resource
+9. Create pod and schedule it on node worker01
+10. Monitor logs of pod and look for error-not-found and redirect message to a file
+11. Check for pod that have lable env=abc and redirect the pod name with highest cpu utilization to a file
+12. Create multicontainer pod with image redis and memcache
+13. Edit pod and add initcontainer with busybox image 
+14. In cluster with worker node in NotReady state, fix cluster by ssh into worker node (make sure changes are permanent)
